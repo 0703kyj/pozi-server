@@ -19,6 +19,14 @@ springdoc:
     operations-sorter: alpha
     tags-sorter: alpha
 
+naver:
+  client:
+    id: ${NAVER_ID}
+    secret: ${NAVER_SECRET}
+  map:
+    id: ${NAVER_MAP_ID}
+    secret: ${NAVER_MAP_SECRET}
+
 ---
 
 spring:
