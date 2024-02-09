@@ -19,3 +19,9 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+tasks.named("bootBuildImage") {
+    imageName = "435918154703.dkr.ecr.ap-northeast-2.amazonaws.com/pozi-server"
+    tags = ['latest', '0.0.1']
+    environment["platform"] = 'linux/amd64'
+}
