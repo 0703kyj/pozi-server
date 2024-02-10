@@ -2,6 +2,8 @@ package com.pozi.api.controller;
 
 import com.pozi.api.dto.StudioListResponse;
 import com.pozi.api.service.StudioService;
+import com.pozi.common.exception.badrequest.BadRequestStudioException;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +31,9 @@ public class StudioController {
             @RequestParam("latitude") Double latitude,
             @RequestParam("longitude") Double longitude
     ) {
+        if(studio.isBlank()){
+            throw new BadRequestStudioException();
+        }
         return studioService.searchStudio(studio,latitude,longitude);
     }
 }

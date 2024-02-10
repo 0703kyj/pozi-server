@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
+import com.pozi.common.exception.badrequest.studio.BadRequestStudioRegionException;
 import com.pozi.naver.NaverProvider;
 import com.pozi.naver.dto.response.map.Address;
 import com.pozi.naver.dto.response.map.NaverMapResponse;
@@ -23,6 +25,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -102,14 +105,35 @@ public class NaverProviderImpl implements NaverProvider {
         requestHeaders.put("X-NCP-APIGW-API-KEY-ID", mapId);
         requestHeaders.put("X-NCP-APIGW-API-KEY", mapSecret);
 
-        JsonElement jsonElement = JsonParser.parseString(get(apiURL, requestHeaders));
-        JsonObject jsonObject = jsonElement.getAsJsonObject();
+        JsonObject jsonObject = getJsonObject(apiURL, requestHeaders);
+
+        validateResult(jsonObject);
 
         return jsonObject.getAsJsonArray("results")
                 .get(0).getAsJsonObject()
                 .getAsJsonObject("region")
                 .getAsJsonObject("area2")
                 .get("name").getAsString();
+    }
+
+    private JsonObject getJsonObject(String apiURL, Map<String, String> requestHeaders) {
+
+        JsonObject jsonObject;
+        try {
+            JsonElement jsonElement = JsonParser.parseString(get(apiURL, requestHeaders));
+            jsonObject = jsonElement.getAsJsonObject();
+        } catch (JsonSyntaxException e) {
+            throw new IllegalArgumentException("JSON 형식으로 변환할 수 없습니다.");
+        }
+
+        return jsonObject;
+    }
+
+    private void validateResult(JsonObject jsonObject) {
+        String status = jsonObject.getAsJsonObject("status").get("code").getAsString();
+        if (status.equals("3")){
+            throw new BadRequestStudioRegionException();
+        }
     }
 
     private NaverMapResponse getCoordinate(String query) {
@@ -133,7 +157,7 @@ public class NaverProviderImpl implements NaverProvider {
         HttpURLConnection con = connect(apiUrl);
         try {
             con.setRequestMethod("GET");
-            for(Map.Entry<String, String> header :requestHeaders.entrySet()) {
+            for(Entry<String, String> header :requestHeaders.entrySet()) {
                 con.setRequestProperty(header.getKey(), header.getValue());
             }
 

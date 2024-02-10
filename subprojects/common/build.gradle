@@ -3,10 +3,6 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-
-    //gson
-    implementation 'com.google.code.gson:gson:2.10.1'
-    implementation project(':common')
 }
 
 tasks.named('test') {
