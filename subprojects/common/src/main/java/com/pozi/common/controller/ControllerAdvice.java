@@ -86,8 +86,12 @@ public class ControllerAdvice {
     }
 
     @ExceptionHandler(PoziException.class)
-    public ResponseEntity<ErrorResponse> handlePoziException(PoziException e) {
-        return ResponseEntity.status(e.getHttpStatus()).body(new ErrorResponse(e.getCode(), e.getMessage()));
+    public ResponseEntity<ErrorResponse> handlePoziException(PoziException e, HttpServletRequest request) {
+        log.error("PoziException: {} {} errMessage={}\n",
+                request.getMethod(),
+                request.getRequestURI(),
+                e.toString()
+        );return ResponseEntity.status(e.getHttpStatus()).body(new ErrorResponse(e.getCode(), e.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)
@@ -95,7 +99,7 @@ public class ControllerAdvice {
         log.error("UnhandledException: {} {} errMessage={}\n",
                 request.getMethod(),
                 request.getRequestURI(),
-                e.getMessage()
+                e.toString()
         );
         return ResponseEntity.internalServerError()
                 .body(new ErrorResponse(9999, "일시적으로 접속이 원활하지 않습니다. 서버 팀에 문의 부탁드립니다."));

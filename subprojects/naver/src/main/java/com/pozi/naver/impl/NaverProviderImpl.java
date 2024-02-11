@@ -67,7 +67,12 @@ public class NaverProviderImpl implements NaverProvider {
         requestHeaders.put("X-Naver-Client-Id", clientId);
         requestHeaders.put("X-Naver-Client-Secret", clientSecret);
 
-        return gson.fromJson(get(apiURL,requestHeaders), NaverSearchResponse.class);
+        String searchResult = get(apiURL, requestHeaders);
+        log.info("search:{}", searchResult);
+        if(getJsonObject(searchResult).has("items")){
+            return gson.fromJson(searchResult, NaverSearchResponse.class);
+        }
+        return getSearchResponse(studio, latitude, longitude);
     }
 
     @Override
@@ -77,14 +82,12 @@ public class NaverProviderImpl implements NaverProvider {
         List<NaverStudioResponse> studios = new ArrayList<>();
 
         for (Item item : items) {
-            Address address = getCoordinate(item.roadAddress()).addresses().get(0);
-
             studios.add(NaverStudioResponse.of(
                     item.title(),
                     item.address(),
                     item.roadAddress(),
-                    address.latitude(),
-                    address.longitude()
+                    item.mapx(),
+                    item.mapy()
             ));
         }
 
@@ -105,9 +108,9 @@ public class NaverProviderImpl implements NaverProvider {
         requestHeaders.put("X-NCP-APIGW-API-KEY-ID", mapId);
         requestHeaders.put("X-NCP-APIGW-API-KEY", mapSecret);
 
-        JsonObject jsonObject = getJsonObject(apiURL, requestHeaders);
+        JsonObject jsonObject = getJsonObject(get(apiURL, requestHeaders));
 
-        validateResult(jsonObject);
+        validateAreaResult(jsonObject);
 
         return jsonObject.getAsJsonArray("results")
                 .get(0).getAsJsonObject()
@@ -116,11 +119,11 @@ public class NaverProviderImpl implements NaverProvider {
                 .get("name").getAsString();
     }
 
-    private JsonObject getJsonObject(String apiURL, Map<String, String> requestHeaders) {
+    private JsonObject getJsonObject(String result) {
 
         JsonObject jsonObject;
         try {
-            JsonElement jsonElement = JsonParser.parseString(get(apiURL, requestHeaders));
+            JsonElement jsonElement = JsonParser.parseString(result);
             jsonObject = jsonElement.getAsJsonObject();
         } catch (JsonSyntaxException e) {
             throw new IllegalArgumentException("JSON 형식으로 변환할 수 없습니다.");
@@ -129,13 +132,14 @@ public class NaverProviderImpl implements NaverProvider {
         return jsonObject;
     }
 
-    private void validateResult(JsonObject jsonObject) {
+    private void validateAreaResult(JsonObject jsonObject) {
         String status = jsonObject.getAsJsonObject("status").get("code").getAsString();
         if (status.equals("3")){
             throw new BadRequestStudioRegionException();
         }
     }
 
+    @Deprecated
     private NaverMapResponse getCoordinate(String query) {
         String text;
         try {
@@ -150,7 +154,8 @@ public class NaverProviderImpl implements NaverProvider {
         requestHeaders.put("X-NCP-APIGW-API-KEY-ID", mapId);
         requestHeaders.put("X-NCP-APIGW-API-KEY", mapSecret);
 
-        return gson.fromJson(get(apiURL,requestHeaders), NaverMapResponse.class);
+        String coordinate = get(apiURL, requestHeaders);
+        return gson.fromJson(coordinate, NaverMapResponse.class);
     }
 
     private String get(String apiUrl, Map<String, String> requestHeaders){

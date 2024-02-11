@@ -12,9 +12,9 @@ public record Item(
         @SerializedName("roadAddress")
         String roadAddress,
         @SerializedName("mapx")
-        String mapx,
+        Double mapx,
         @SerializedName("mapy")
-        String mapy
+        Double mapy
 ) {
 
 }

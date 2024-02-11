@@ -18,6 +18,6 @@ public class Studio{
     String name;
     String address;
     String roadAddress;
-    Double latitude;
-    Double longitude;
+    Double mapx;
+    Double mapy;
 }
