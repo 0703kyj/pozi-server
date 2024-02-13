@@ -20,29 +20,35 @@ public class StudioService {
 
     private final NaverProvider naverProvider;
     private static final List<String> studios = List.of(
-            "인생 네컷", "포토매니아", "포토이즘", "하루필름",
-            "홍대네컷", "포토시그니처", "포토메틱", "포토아이브",
-            "셀픽스", "비룸스튜디오", "포토드링크", "플랜비스튜디오","포토그레이"
+            "포토매틱", "하루필름", "셀픽스", "포토드링크", "포토그레이", "포토이즘", "비룸 스튜디오",
+            "인생네컷", "포토시그니처", "포토하임", "홍대네컷", "포토아이브", "플랜비 스튜디오", "포니필름"
     );
 
     @Transactional
-    public StudioListResponse searchStudio(String studio, Double latitude, Double longitude){
-        NaverSearchResponse searchResponse = naverProvider.getSearchResponse(studio, latitude, longitude);
-        NaverStudioListResponse studioListResponse = naverProvider.getStudio(searchResponse);
+    public StudioListResponse searchStudio(String studio, Double latitude, Double longitude) {
+        log.info("StudioService.searchStudio [{}, {}, {}]", studio, latitude, longitude);
+
+        NaverSearchResponse searchResponse = naverProvider.getSearchResponse(studio, latitude,
+                longitude);
+        NaverStudioListResponse studioListResponse = naverProvider.getStudio(studio,
+                searchResponse);
 
         return StudioListResponse.of(studioListResponse.studios());
     }
 
     @Transactional
     public StudioListResponse getDefaultStudios(Double latitude, Double longitude) {
+        log.info("StudioService.getDefaultStudios [{}, {}]", latitude, longitude);
+
         List<NaverStudioResponse> searchedStudios = new ArrayList<>();
 
         for (String studio : studios) {
-            NaverSearchResponse searchResponse = naverProvider.getSearchResponse(studio, latitude, longitude);
-            NaverStudioListResponse studioListResponse = naverProvider.getStudio(searchResponse);
+            NaverSearchResponse searchResponse = naverProvider.getSearchResponse(studio, latitude,
+                    longitude);
+            NaverStudioListResponse studioListResponse = naverProvider.getStudio(studio,
+                    searchResponse);
             searchedStudios.addAll(studioListResponse.studios());
         }
-
         return StudioListResponse.of(searchedStudios);
     }
 }
