@@ -25,23 +25,30 @@ public class StudioService {
     );
 
     @Transactional
-    public StudioListResponse searchStudio(String studio, Double latitude, Double longitude){
-        NaverSearchResponse searchResponse = naverProvider.getSearchResponse(studio, latitude, longitude);
-        NaverStudioListResponse studioListResponse = naverProvider.getStudio(studio, searchResponse);
+    public StudioListResponse searchStudio(String studio, Double latitude, Double longitude) {
+        log.info("StudioService.searchStudio [{}, {}, {}]", studio, latitude, longitude);
+
+        NaverSearchResponse searchResponse = naverProvider.getSearchResponse(studio, latitude,
+                longitude);
+        NaverStudioListResponse studioListResponse = naverProvider.getStudio(studio,
+                searchResponse);
 
         return StudioListResponse.of(studioListResponse.studios());
     }
 
     @Transactional
     public StudioListResponse getDefaultStudios(Double latitude, Double longitude) {
+        log.info("StudioService.getDefaultStudios [{}, {}]", latitude, longitude);
+
         List<NaverStudioResponse> searchedStudios = new ArrayList<>();
 
         for (String studio : studios) {
-            NaverSearchResponse searchResponse = naverProvider.getSearchResponse(studio, latitude, longitude);
-            NaverStudioListResponse studioListResponse = naverProvider.getStudio(studio, searchResponse);
+            NaverSearchResponse searchResponse = naverProvider.getSearchResponse(studio, latitude,
+                    longitude);
+            NaverStudioListResponse studioListResponse = naverProvider.getStudio(studio,
+                    searchResponse);
             searchedStudios.addAll(studioListResponse.studios());
         }
-
         return StudioListResponse.of(searchedStudios);
     }
 }
