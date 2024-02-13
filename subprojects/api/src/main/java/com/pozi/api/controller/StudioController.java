@@ -20,9 +20,9 @@ public class StudioController {
 
     @GetMapping
     public StudioListResponse getDefaultStudios(
-            @Parameter(description = "위도", example = "37.4199696")
+            @Parameter(description = "위도", example = "37.5372192")
             @RequestParam("latitude") Double latitude,
-            @Parameter(description = "경도", example = "127.126651")
+            @Parameter(description = "경도", example = "127.077571")
             @RequestParam("longitude") Double longitude
     ) {
         return studioService.getDefaultStudios(latitude,longitude);
@@ -30,11 +30,11 @@ public class StudioController {
 
     @GetMapping("/search")
     public StudioListResponse searchStudio(
-            @Parameter(description = "스튜디오 명", example = "인생 네컷")
+            @Parameter(description = "스튜디오 명", example = "인생네컷")
             @RequestParam("studio") String studio,
-            @Parameter(description = "위도", example = "37.4199696")
+            @Parameter(description = "위도", example = "37.5372192")
             @RequestParam("latitude") Double latitude,
-            @Parameter(description = "경도", example = "127.126651")
+            @Parameter(description = "경도", example = "127.077571")
             @RequestParam("longitude") Double longitude
     ) {
         if(studio.isBlank()){

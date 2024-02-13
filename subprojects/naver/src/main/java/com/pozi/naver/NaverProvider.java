@@ -7,5 +7,5 @@ public interface NaverProvider {
 
     public NaverSearchResponse getSearchResponse(String studio, Double latitude, Double longitude);
 
-    public NaverStudioListResponse getStudio(NaverSearchResponse response);
+    public NaverStudioListResponse getStudio(String studio, NaverSearchResponse response);
 }
