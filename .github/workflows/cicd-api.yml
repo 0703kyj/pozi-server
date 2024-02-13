@@ -55,18 +55,12 @@ jobs:
           docker build --platform linux/amd64 -t ${{ env.DOCKER_IMAGE_NAME }} .   
           docker tag ${{ env.DOCKER_IMAGE_NAME }}:latest ${{ env.DOCKER_REGISTRY_URL }}/${{ env.DOCKER_IMAGE_NAME }}:latest
           docker push ${{ env.DOCKER_REGISTRY_URL }}/${{ env.DOCKER_IMAGE_NAME }}:latest
-          echo "::set-output name=image::${{ env.DOCKER_REGISTRY_URL }}/${{ env.DOCKER_IMAGE_NAME }}:latest
+          echo "::set-output name=image::${{ env.DOCKER_REGISTRY_URL }}/${{ env.DOCKER_IMAGE_NAME }}:latest"
 
-      - name: Log in to NCP Docker Registry
-        run: echo "${{ secrets.DOCKER_REGISTRY_PASSWORD }}" | docker login ${{ env.DOCKER_REGISTRY_URL }} -u ${{ secrets.DOCKER_REGISTRY_USERNAME }} --password-stdin
-
-      - name: Push Docker Image to NCP Registry
-        run: docker push ${{ env.DOCKER_REGISTRY_URL }}/${{ env.DOCKER_IMAGE_NAME }}
-  deploy-to-ncp:
+  deploy:
     needs: build-and-push-docker-image
     runs-on: ubuntu-latest
     steps:
-
     - name: Deploy via SSH
       uses: appleboy/ssh-action@master
       with:
